@@ -81,11 +81,37 @@ MySQL Workbench was used for this step in the project. When the data was importe
   
 #### 3. *"time category"* (categorical) column
 - We created 6 time categories: Early Morning (3:00AM - 5:59AM), Morning (6:00AM - 11:59AM), Afternoon (12:00PM - 5:59PM), Evening (6:00PM - 8:59PM), Night (9:00PM - 11:59PM), Late Night (12:00AM - 2:59AM)
-<img width="640" alt="Screenshot 2024-06-20 at 7 48 54 PM" src="https://github.com/mridul-bhalla/NYC-Traffic-Accidents-Analysis/assets/158173545/d8cec620-2fc4-49cb-b411-9129b86357bc">
+- ```SQL
+  -- Adding time category column
+      ALTER TABLE collisions_staging
+      ADD time_category VARCHAR(20);
+
+      UPDATE collisions_staging
+      SET time_category = CASE
+      WHEN TIME(collision_time) BETWEEN '06:00:00' AND '11:59:59' THEN 'Morning'
+      WHEN TIME(collision_time) BETWEEN '12:00:00' AND '17:59:59' THEN 'Afternoon'
+      WHEN TIME(collision_time) BETWEEN '18:00:00' AND '20:59:59' THEN 'Evening'
+      WHEN TIME(collision_time) BETWEEN '21:00:00' AND '23:59:59' THEN 'Night'
+      WHEN TIME(collision_time) BETWEEN '00:00:00' AND '02:59:59' THEN 'Late Night'
+      ELSE 'Early Morning'
+      END;
+  ```
 
 #### 4. *"Season"* Column
-- We created 4 categories for season: Spring (Mar, Apr, May), Summer (Jun, July, Aug), Fall (Sept, Oct, Nov), Winter (Dec, Jan, Feb), 
-<img width="457" alt="Screenshot 2024-06-20 at 7 57 16 PM" src="https://github.com/mridul-bhalla/NYC-Traffic-Accidents-Analysis/assets/158173545/f8b0165e-953f-4efe-92e7-8f49f2c71988">
+- We created 4 categories for season: Spring (Mar, Apr, May), Summer (Jun, July, Aug), Fall (Sept, Oct, Nov), Winter (Dec, Jan, Feb)
+- ```SQL
+  -- Adding Season Column
+      ALTER TABLE collisions_staging
+      ADD season VARCHAR(10);
+
+      UPDATE collisions_staging
+      SET season = CASE
+      WHEN MONTH(collision_date) IN (12, 1, 2) THEN 'Winter'
+      WHEN MONTH(collision_date) IN (3, 4, 5) THEN 'Spring'
+      WHEN MONTH(collision_date) IN (6, 7, 8) THEN 'Summer'
+      ELSE 'Fall'
+      END;
+  ```
 
 #### 5. *"Holiday Indicator"* Column
 - We took the dates for the metioned years (2021, 2022, 2023) that are National Holidays in USA.
